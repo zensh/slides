@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Koa &amp; Toa 开发实践</title>
+
+		<meta name="description" content="">
+		<meta name="author" content="zensh">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="../bower_components/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../bower_components/reveal.js/css/theme/beige.css" id="theme">
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="../bower_components/reveal.js/lib/css/zenburn.css">
+
+		<link rel="stylesheet" href="css/app.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? '../bower_components/reveal.js/css/print/pdf.css' : '../bower_components/reveal.js/css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="../bower_components/reveal.js/lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal zensh">
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section>
+					<h1>Koa &amp; Toa 开发实践</h1>
+					<p>
+						<strong>框架原理 ·</strong>
+						<strong>异步流程控制和异常处理机制 ·</strong>
+						<strong>组件开发模式</strong>
+					</p>
+					<p>
+						<small><a href="https://github.com/zensh">github.com/zensh</a><span> | </span><a href="http://weibo.com/zensh">@ZENSH严清</a></small>
+					</p>
+				</section>
+
+				<section data-background="img/github.png">
+					<section></section>
+					<section data-background="rgba(255, 255, 255, 0.85)" data-background-transition="zoom">
+						<p class="fragment left">Joined GitHub: 21 Jun 2011</p>
+				    <p class="fragment left">第一行代码：24 Dec 2012</p>
+				    <p class="fragment left">目前开源项目：40+</p>
+				    <p class="fragment left">早期项目：jsgen，thenjs</p>
+				    <p class="fragment left">目前活跃项目：thunks 系列，Toa 系列</p>
+					</section>
+				</section>
+
+				<section data-background="img/teambition.png">
+					<section></section>
+					<section data-background="rgba(255, 255, 255, 0.85)" data-background-transition="zoom">
+						<p class="fragment left">Teambition 产品线技术负责人</p>
+						<p class="fragment left">2013 ~ 2014：前端开发</p>
+						<p class="fragment left">2015：后端开发，基于 thunks 和 Toa 的系统重构：</p>
+						<p class="fragment left">
+							<strong>用户社区，</strong>
+							<strong>文件系统，</strong>
+							<strong>消息系统</strong>
+						</p>
+					</section>
+				</section>
+
+				<section>
+					<section data-background="img/koa.png"></section>
+					<section data-background="img/toa.png"></section>
+					<section>
+						<p class="fragment left">13 年 12 月，koa 开发日志系统 logCI Server</p>
+						<p class="fragment left">14 年 6 月，杭 JS：《JavaScript 异步库》，thunks 亮相</p>
+						<p class="fragment left">11 月，co v4 转投 promise，thunks 愤而支持 generator</p>
+						<p class="fragment left">11 月底，思考 koa，新轮子 Toa v0.1.0</p>
+						<p class="fragment left">更多的轮子：thunks modules, Toa modules...</p>
+					</section>
+				</section>
+
+				<section>
+					<h2><a href="http://tomasp.net/blog/2015/library-frameworks/" target="_blank">Frameworks are evil?</a></h2>
+					<ol>
+						<li class="fragment left">Do not compose</li>
+						<li class="fragment left">Hard to explore</li>
+						<li class="fragment left">Shape how you code</li>
+					</ol>
+				</section>
+
+				<section>
+					<section>
+						<h2>Bare style</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+var http = require('http');
+
+var app = http.createServer(function(req, res) {
+  /* ... */
+  res.end('Hello World\n');
+});
+
+app.listen(3000);
+						</code></pre>
+					</section>
+					<section>
+						<h2 class="fragment">我们需要 Framework！</h2>
+						<h2 class="fragment">Lightweight Framework</h2>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Express style</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+var app = express();
+
+app.use(function(req, res, next) {
+	/* ... */
+  next();
+});
+
+app.use(function(req, res, next) {
+	/* ... */
+	res.send('Hello World\n');
+});
+
+app.listen(3000);
+						</code></pre>
+						<p class="fragment highlight-red">关键词：<code>req</code>, <code>res</code>, <code>next</code></p>
+					</section>
+					<section data-background="img/process_express.png"></section>
+					<section>
+						<h2>express</h2>
+						<ol>
+							<li class="fragment">处理流程简洁明了</li>
+							<li class="fragment">经过长时间的实际需求历练，API 渐趋完善</li>
+							<li class="fragment">缺乏异步流程控制（异常处理）能力</li>
+							<li class="fragment">历史包袱重，功能太多，back-compat 太多</li>
+						</ol>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Koa style</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+var app = koa();
+
+app.use(function*(next) {
+	/* this.req... */
+	/* this.res... */
+  yield next;
+	/* console.log('we are back...') */
+});
+
+app.use(function*(next) {
+  /* ... */
+	this.body = 'Hello World\n';
+});
+
+app.listen(3000);
+						</code></pre>
+						<p class="fragment highlight-red">关键词：<code>this</code>, <code>yield</code>, <code>next</code></p>
+					</section>
+					<section data-background="img/process_koa.png"></section>
+					<section>
+						<h2>koa</h2>
+						<ol>
+							<li class="fragment">汲取 express 的优点，砍掉业务功能逻辑，API 简洁，实用</li>
+							<li class="fragment">集成异步流程控制（异常处理）能力</li>
+							<li class="fragment">级联模式处理流程复杂</li>
+							<li class="fragment">中间件模式，对第三方暴露太多</li>
+						</ol>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Toa style</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+var app = toa(function*() {
+	/* ... */
+	this.body = 'Hello World\n';
+});
+
+app.use(function*() {
+	/* ... */
+	/* this.req... */
+	/* this.res... */
+});
+
+app.listen(3000);
+						</code></pre>
+						<p class="fragment highlight-red">关键词：<code>this</code>, <code>yield</code></p>
+					</section>
+					<section data-background="img/process_toa.png"></section>
+					<section>
+						<h2>Toa 的背后是 koa！</h2>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>异步流程控制</h2>
+						<h2>异常处理机制</h2>
+					</section>
+					<section>
+						<h2>koa / co</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+// 截取部分代码
+app.callback = function(){
+  var mw = [respond].concat(this.middleware);
+  var fn = this.experimental
+    ? compose_es7(mw)
+    : co.wrap(compose(mw));
+  var self = this;
+
+  return function(req, res){
+    res.statusCode = 404;
+    var ctx = self.createContext(req, res);
+    onFinished(res, ctx.onerror);
+    fn.call(ctx).catch(ctx.onerror);
+  }
+};
+						</code></pre>
+					</section>
+					<section>
+						<h2>Toa / thunks</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+// 截取部分代码
+server.addListener('request', function(req, res) {
+	function onerror(err) {/*...*/}
+
+	var ctx = createContext(app, req, res);
+	var thunk = thunks({
+	  debug: debug,
+	  onerror: onerror
+	});
+
+	thunk.seq.call(ctx, middleware)(function() {
+	  return body.call(this, thunk);
+	})(function() {
+	  return thunk.seq.call(this, this.onPreEnd);
+	})(respond);
+});
+						</code></pre>
+					</section>
+					<section>
+						<h2>Teambition 用户社区代码</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+issueAPI.createIssue = function*() {
+  var token = this.token; // getter，自动验证 token
+  if (!token._id || token.hasRight < 0) this.throw(401);
+  var issue = yield this.parseBody();
+  issue = validateIssue(issue);
+  if (!issue.title) this.throw(422, 'Issue title required');
+  if (!issue.content) this.throw(422, 'Issue content required');
+  if (token.hasRight < 1 && issue.category === 'official') this.throw(422);
+  issue = yield issueDao.createIssue({
+    title: issue.title,
+    content: issue.content,
+    category: issue.category || '',
+    createdBy: token._id
+  });
+  this.body = (yield fillCreatorAndUpdaterByArray([issue]))[0];
+};
+						</code></pre>
+						<p class="fragment">用同步代码书写异步情怀</p>
+					</section>
+					<section>
+						<h2>灵活的 error catch</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+userAPI.findOrCreate = function*(user) {
+  if (!validator.isMongoId(user._id)) tools.throw(400);
+  try {
+    user = yield userDao.findById(user._id);
+  } catch (err) {
+    /* 自动创建用户 */
+    user = yield userDao.create(user);
+    user.isNew = true;
+  }
+  return yield findUserPreference(user);
+};
+						</code></pre>
+						<p class="fragment">自行 catch 处理，或抛给 koa / Toa 自动处理</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>koa / Toa 组件开发模式</h2>
+					</section>
+					<section>
+						<h2>中间件模式</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+// koa-favicon
+module.exports = function (path, options){
+  /* 省略代码 */
+  return function *favicon(next){
+    if ('/favicon.ico' != this.path) return yield next;
+    if (!path) return;
+    if ('GET' !== this.method && 'HEAD' !== this.method) {
+      this.status = 'OPTIONS' == this.method ? 200 : 405;
+      this.set('Allow', 'GET, HEAD, OPTIONS');
+      return;
+    }
+    if (!icon) icon = yield fs.readFile(path);
+    this.set('Cache-Control', 'public, max-age=' + (maxAge / 1000 | 0));
+    this.type = 'image/x-icon';
+    this.body = icon;
+  };
+};
+						</code></pre>
+					</section>
+					<section>
+						<h2>原型方法模式</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+// toa-token
+module.exports = function toaToken(app, secretOrPrivateKeys, options) {
+	/* 省略代码 */
+  app.verifyToken = app.context.verifyToken = verifyToken;
+  app.signToken = app.context.signToken = function(payload) {
+    return jwt.sign(payload, secretOrPrivateKeys[0], options);
+  };
+  app.decodeToken = app.context.decodeToken = function(token, options) {
+    return jwt.decode(token, options);
+  };
+  Object.defineProperty(app.context, 'token', {
+    enumerable: true,
+    configurable: false,
+    get: function () {/* 省略代码 */}
+  });
+	/* 省略代码 */
+};
+						</code></pre>
+					</section>
+					<section>
+						<h2>更纯净的原型方法模式</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+app.context.someCtxMethod = someCtxMethod(options);
+app.request.someReqMethod = someReqMethod(options);
+app.response.someResMethod = someResMethod(options);
+
+// Object.create 创建的 context, request, response
+function createContext(app, req, res) {
+  var context = Object.create(app.context);
+  var request = context.request = Object.create(app.request);
+  var response = context.response = Object.create(app.response);
+
+  response.request = request;
+  request.response = response;
+  request.ctx = response.ctx = context;
+  context.req = request.req = response.req = req;
+  context.res = request.res = response.res = res;
+}
+						</code></pre>
+					</section>
+					<section>
+						<h2>小模块组件模式</h2>
+						<pre><code class="javascript" data-trim contenteditable>
+// use: var res = yield someServiceA(this.res);
+// generator function
+exports.someServiceA = function*(res) {
+	/*service code*/
+};
+// return thunk
+exports.someServiceB = function(req) {
+	return function(done) {
+		/*service code*/
+	};
+};
+// return promise
+exports.someServiceC = function(data) {
+	return new Promise(resolve, reject) {
+		/*service code*/
+	};
+};
+						</code></pre>
+						<p class="fragment">Toa 推荐模式，完全控制模块访问权限，更安全</p>
+					</section>
+				</section>
+
+				<section>
+					<h2>那么，开发实践？</h2>
+					<p class="fragment">前端 -> 异步控制 -> 轮子 Toa -> 重构后端服务</p>
+					<h2 class="fragment">Q / A</h2>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="../bower_components/reveal.js/lib/js/head.min.js"></script>
+		<script src="../bower_components/reveal.js/js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+				backgroundTransition: 'convex', // none/fade/slide/convex/concave/zoom
+				// Parallax background image
+		    // parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+		    // Parallax background size
+		    // parallaxBackgroundSize: '', // CSS syntax, e.g. "2100px 900px"
+
+				// Optional reveal.js plugins
+				dependencies: [
+					{ src: '../bower_components/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: '../bower_components/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../bower_components/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: '../bower_components/reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: '../bower_components/reveal.js/plugin/zoom-js/zoom.js', async: true },
+					{ src: '../bower_components/reveal.js/plugin/notes/notes.js', async: true }
+				]
+			});
+
+			// Reveal.addEventListener('slidechanged', function(event) {
+			  // console.log(event.previousSlide, event.currentSlide, event.indexh, event.indexv)
+			// });
+
+		</script>
+
+	</body>
+</html>
