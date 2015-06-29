@@ -1,0 +1,11 @@
+.zensh .fragment.left {
+  text-align: left !important;
+}
+
+.zensh .slide-background {
+  background-size: contain !important;
+}
+
+.zensh.reveal h3 {
+  text-transform: none;
+}

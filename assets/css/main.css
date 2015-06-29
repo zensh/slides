@@ -1,0 +1,28 @@
+.page-header {
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0 auto;
+  font-size: 168px;
+}
+
+.page-header .project-tagline {
+  font-size: 32px;
+}
+
+.page-header .project-tagline p {
+  margin: 0;
+}
+
+.main-content {
+  width: 600px;
+  max-width: 100%;
+  margin: 40px auto 20px;
+}
+
+.main-content a {
+  display: block;
+  margin: 20px 0;
+  font-size: 32px;
+}

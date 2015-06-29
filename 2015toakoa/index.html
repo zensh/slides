@@ -1,43 +1,23 @@
 <!doctype html>
 <html lang="en">
-
 	<head>
 		<meta charset="utf-8">
-
 		<title>Koa &amp; Toa 开发实践</title>
-
 		<meta name="description" content="">
 		<meta name="author" content="zensh">
-
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-
-		<link rel="stylesheet" href="../bower_components/reveal.js/css/reveal.css">
-		<link rel="stylesheet" href="../bower_components/reveal.js/css/theme/beige.css" id="theme">
-
+		<link rel="stylesheet" href="../assets/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../assets/reveal.js/css/theme/beige.css" id="theme">
 		<!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="../bower_components/reveal.js/lib/css/zenburn.css">
-
+		<link rel="stylesheet" href="../assets/reveal.js/lib/css/zenburn.css">
 		<link rel="stylesheet" href="css/app.css">
-
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? '../bower_components/reveal.js/css/print/pdf.css' : '../bower_components/reveal.js/css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
-
 		<!--[if lt IE 9]>
-		<script src="../bower_components/reveal.js/lib/js/html5shiv.js"></script>
+		<script src="../assets/reveal.js/lib/js/html5shiv.js"></script>
 		<![endif]-->
 	</head>
-
 	<body>
-
 		<div class="reveal zensh">
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
@@ -400,43 +380,11 @@ exports.someServiceC = function(data) {
 			</div>
 		</div>
 
-		<script src="../bower_components/reveal.js/lib/js/head.min.js"></script>
-		<script src="../bower_components/reveal.js/js/reveal.js"></script>
-
-		<script>
-
-			// Full list of configuration options available at:
-			// https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				history: true,
-				center: true,
-
-				transition: 'slide', // none/fade/slide/convex/concave/zoom
-				backgroundTransition: 'convex', // none/fade/slide/convex/concave/zoom
-				// Parallax background image
-		    // parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
-
-		    // Parallax background size
-		    // parallaxBackgroundSize: '', // CSS syntax, e.g. "2100px 900px"
-
-				// Optional reveal.js plugins
-				dependencies: [
-					{ src: '../bower_components/reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: '../bower_components/reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: '../bower_components/reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: '../bower_components/reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: '../bower_components/reveal.js/plugin/zoom-js/zoom.js', async: true },
-					{ src: '../bower_components/reveal.js/plugin/notes/notes.js', async: true }
-				]
-			});
-
-			// Reveal.addEventListener('slidechanged', function(event) {
-			  // console.log(event.previousSlide, event.currentSlide, event.indexh, event.indexv)
-			// });
-
-		</script>
-
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/js/app.js"></script>
+		<script src="//google-analytics.com/ga.js"></script>
 	</body>
 </html>
