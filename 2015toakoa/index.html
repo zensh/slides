@@ -2,32 +2,30 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>Koa &amp; Toa 开发实践</title>
+		<title>koa &amp; Toa</title>
 		<meta name="description" content="">
 		<meta name="author" content="zensh">
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+		<link rel="stylesheet" href="../assets/css/normalize.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/github-light.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/main.css" media="screen">
 		<link rel="stylesheet" href="../assets/reveal.js/css/reveal.css">
 		<link rel="stylesheet" href="../assets/reveal.js/css/theme/beige.css" id="theme">
-		<!-- Code syntax highlighting -->
 		<link rel="stylesheet" href="../assets/reveal.js/lib/css/zenburn.css">
 		<link rel="stylesheet" href="css/app.css">
-		<!--[if lt IE 9]>
-		<script src="../assets/reveal.js/lib/js/html5shiv.js"></script>
-		<![endif]-->
 	</head>
 	<body>
 		<div class="reveal zensh">
-			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
 				<section>
-					<h1>Koa &amp; Toa 开发实践</h1>
-					<p>
-						<strong>框架原理 ·</strong>
-						<strong>异步流程控制和异常处理机制 ·</strong>
-						<strong>组件开发模式</strong>
-					</p>
+					<h1>koa &amp; Toa</h1>
+					<ul>
+						<li>框架原理</li>
+						<li>异步流程控制和异常处理机制</li>
+						<li>组件开发模式</li>
+					</ul>
 					<p>
 						<small><a href="https://github.com/zensh">github.com/zensh</a><span> | </span><a href="http://weibo.com/zensh">@ZENSH严清</a></small>
 					</p>
@@ -35,130 +33,142 @@
 
 				<section data-background="img/github.png">
 					<section></section>
-					<section data-background="rgba(255, 255, 255, 0.85)" data-background-transition="zoom">
-						<p class="fragment left">Joined GitHub: 21 Jun 2011</p>
-				    <p class="fragment left">第一行代码：24 Dec 2012</p>
-				    <p class="fragment left">目前开源项目：40+</p>
-				    <p class="fragment left">早期项目：jsgen，thenjs</p>
-				    <p class="fragment left">目前活跃项目：thunks 系列，Toa 系列</p>
+					<section data-background="rgba(255, 255, 255, 0.9)" data-background-transition="zoom">
+						<ul>
+							<li>Joined GitHub: 21 Jun 2011</li>
+							<li>第一行代码：24 Dec 2012</li>
+							<li>目前开源项目：40+</li>
+							<li>早期项目：jsgen，thenjs 等</li>
+							<li>目前活跃项目：thunks 系列，Toa 系列</li>
+						<ul>
 					</section>
 				</section>
 
 				<section data-background="img/teambition.png">
 					<section></section>
-					<section data-background="rgba(255, 255, 255, 0.85)" data-background-transition="zoom">
-						<p class="fragment left">Teambition 产品线技术负责人</p>
-						<p class="fragment left">2013 ~ 2014：前端开发</p>
-						<p class="fragment left">2015：后端开发，基于 thunks 和 Toa 的系统重构：</p>
-						<p class="fragment left">
-							<strong>用户社区，</strong>
-							<strong>文件系统，</strong>
-							<strong>消息系统</strong>
-						</p>
+					<section data-background="rgba(255, 255, 255, 0.9)" data-background-transition="zoom">
+						<p class="teambition-logo">teambition</p>
+					</section>
+					<section data-background="rgba(255, 255, 255, 0.85)">
+						<ul>
+							<li>2013 ~ 2014：前端开发</li>
+							<li>2015：后端开发，基于 thunks 和 Toa 的系统重构：
+								<strong class="green">用户社区，</strong>
+								<strong class="green">文件系统，</strong>
+								<strong class="green">消息系统</strong>
+							</li>
+							<li class="blue"><strong>关注：前后端架构，高扩展性、高可用性、高可维护性</strong></li>
+						</ul>
+						<div class="fragment quanzhan-smile"></div>
 					</section>
 				</section>
 
 				<section>
-					<section data-background="img/koa.png"></section>
-					<section data-background="img/toa.png"></section>
 					<section>
-						<p class="fragment left">13 年 12 月，koa 开发日志系统 logCI Server</p>
-						<p class="fragment left">14 年 6 月，杭 JS：《JavaScript 异步库》，thunks 亮相</p>
-						<p class="fragment left">11 月，co v4 转投 promise，thunks 愤而支持 generator</p>
-						<p class="fragment left">11 月底，思考 koa，新轮子 Toa v0.1.0</p>
-						<p class="fragment left">更多的轮子：thunks modules, Toa modules...</p>
+						<p class="koa-logo">koa<span>['kəʊə]</span></p>
+						<p>next generation web framework for node.js</p>
+					</section>
+					<section>
+						<p class="toa-logo">Toa<span>['təʊə]</span></p>
+						<p>pithy and powerful web framework for node.js</p>
+					</section>
+					<section>
+						<h2>造轮子，非山寨！</h2>
+						<p>俗人造轮子，高手发明轮子，大神设计轮子</p>
+						<strong>庸人混日子</strong>
 					</section>
 				</section>
 
 				<section>
-					<h2><a href="http://tomasp.net/blog/2015/library-frameworks/" target="_blank">Frameworks are evil?</a></h2>
-					<ol>
-						<li class="fragment left">Do not compose</li>
-						<li class="fragment left">Hard to explore</li>
-						<li class="fragment left">Shape how you code</li>
-					</ol>
-				</section>
-
-				<section>
 					<section>
-						<h2>Bare style</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-var http = require('http');
+var app = express()
 
-var app = http.createServer(function(req, res) {
-  /* ... */
-  res.end('Hello World\n');
-});
-
-app.listen(3000);
-						</code></pre>
-					</section>
-					<section>
-						<h2 class="fragment">我们需要 Framework！</h2>
-						<h2 class="fragment">Lightweight Framework</h2>
-					</section>
-				</section>
-
-				<section>
-					<section>
-						<h2>Express style</h2>
-						<pre><code class="javascript" data-trim contenteditable>
-var app = express();
-
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
 	/* ... */
-  next();
-});
-
-app.use(function(req, res, next) {
+  next()
+})
+app.use(function (req, res, next) {
 	/* ... */
-	res.send('Hello World\n');
-});
+	res.send('Hello World\n')
+})
 
-app.listen(3000);
+app.listen(3000)
 						</code></pre>
-						<p class="fragment highlight-red">关键词：<code>req</code>, <code>res</code>, <code>next</code></p>
+						<p><strong>express</strong>: <code class="red">req</code>, <code class="red">res</code>, <code class="red">next</code></p>
 					</section>
 					<section data-background="img/process_express.png"></section>
 					<section>
-						<h2>express</h2>
-						<ol>
-							<li class="fragment">处理流程简洁明了</li>
-							<li class="fragment">经过长时间的实际需求历练，API 渐趋完善</li>
-							<li class="fragment">缺乏异步流程控制（异常处理）能力</li>
-							<li class="fragment">历史包袱重，功能太多，back-compat 太多</li>
-						</ol>
+						<h3>express</h3>
+						<ul>
+							<li>处理流程简洁明了</li>
+							<li>缺乏异步流程控制（异常处理）能力</li>
+							<li>历史包袱重，集成功能多，可扩展性相对差</li>
+						<ul>
 					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2>Koa style</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-var app = koa();
+var app = koa()
 
-app.use(function*(next) {
+app.use(function *(next) {
 	/* this.req... */
 	/* this.res... */
-  yield next;
-	/* console.log('we are back...') */
-});
+  yield next
+	/* will back */
+})
 
-app.use(function*(next) {
+app.use(function *(next) {
   /* ... */
-	this.body = 'Hello World\n';
-});
+	this.body = 'Hello World\n'
+	/* not res.send('Hello World\n') */
+})
 
-app.listen(3000);
+app.listen(3000)
 						</code></pre>
-						<p class="fragment highlight-red">关键词：<code>this</code>, <code>yield</code>, <code>next</code></p>
+						<p><strong>koa</strong>: <code class="red">this</code>, <code class="red">next</code>, <code class="red">yield</code></p>
+					</section>
+					<section>
+						<h3>koa 级联(Cascading)特点</h3>
+						<ol>
+							<li>每一个中间件的逻辑分成了前处理和后处理两部分</li>
+							<li>每一个中间件都可以终止，不进入后续（下游）中间件处理流程</li>
+						</ol>
 					</section>
 					<section data-background="img/process_koa.png"></section>
 					<section>
+						<h3>koa 四大核心</h3>
+						<ol>
+							<li>Application: 异步流程控制 + 级联特性 <a href="http://koajs.com/#application" target="_blank">...</a></li>
+							<li>Context: 挂载各种对象和方法 <a href="http://koajs.com/#context" target="_blank">...</a></li>
+							<li>Request: 定义处理 request 的语法糖 <a href="http://koajs.com/#request" target="_blank">...</a></li>
+							<li>Response: 定义处理 response 的语法糖 <a href="http://koajs.com/#response" target="_blank">...</a></li>
+						</ol>
+					</section>
+					<section>
+						<pre><code class="javascript" data-trim contenteditable>
+app.createContext = function(req, res){
+	var context = Object.create(this.context);
+	var request = context.request = Object.create(this.request);
+	var response = context.response = Object.create(this.response);
+	context.app = request.app = response.app = this;
+	context.req = request.req = response.req = req;
+	context.res = request.res = response.res = res;
+	request.ctx = response.ctx = context;
+	request.response = response;
+	response.request = request;
+	/* ... */
+};
+						</code></pre>
+						<p>生成 context, request, response，<br />全部挂载 app 对象</p>
+					</section>
+					<section>
 						<h2>koa</h2>
 						<ol>
-							<li class="fragment">汲取 express 的优点，砍掉业务功能逻辑，API 简洁，实用</li>
-							<li class="fragment">集成异步流程控制（异常处理）能力</li>
+							<li class="fragment">砍掉业务功能逻辑，API 简洁，实用</li>
+							<li class="fragment">完美的异步流程控制（异常处理）来组合业务逻辑</li>
 							<li class="fragment">级联模式处理流程复杂</li>
 							<li class="fragment">中间件模式，对第三方暴露太多</li>
 						</ol>
@@ -167,26 +177,133 @@ app.listen(3000);
 
 				<section>
 					<section>
-						<h2>Toa style</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-var app = toa(function*() {
-	/* ... */
-	this.body = 'Hello World\n';
-});
+var app = toa(function *() {
+	/* Body */
+	this.body = 'Hello World\n'
+})
 
-app.use(function*() {
+app.use(function *() {
 	/* ... */
 	/* this.req... */
 	/* this.res... */
-});
+})
 
-app.listen(3000);
+app.listen(3000)
 						</code></pre>
-						<p class="fragment highlight-red">关键词：<code>this</code>, <code>yield</code></p>
+						<p><strong>toa</strong>: <code class="red">this</code>, <code class="red">yield</code></p>
 					</section>
 					<section data-background="img/process_toa.png"></section>
 					<section>
-						<h2>Toa 的背后是 koa！</h2>
+						<h3>没有级联怎么办？</h3>
+						<ol>
+							<li>后处理：context.onPreEnd</li>
+							<li>终止业务流程：context.end</li>
+						</ol>
+					</section>
+					<section>
+						<h3>Toa 的背后是 koa！</h3>
+						<div class="fragment pride-smile"></div>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>异步基础</h2>
+						<p>三种异步原语：promise, thunk, generator</p>
+					</section>
+					<section>
+						<h4>promise 三大特征之一：标准接口</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+promise.then(function resolved (res) {
+	/* ... */
+}, function rejected (err) {
+	/* ... */
+})
+						</code></pre>
+						<p>各种 promise 实现之间，或 promise 与其它异步库之间无缝对接</p>
+					</section>
+					<section>
+						<h4>promise 三大特征之二：总是返回新 promise</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+promise.then(resolved).then(resolved).then(resolved).catch(rejected)
+						</code></pre>
+						<p>每一链返回新的 promise 对象，展平异步逻辑</p>
+					</section>
+					<section>
+						<h4>promise 三大特征之三：对内部 `return promise` 求值</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+var promiseX = promiseA.then(function (resA) {
+	/* ... */
+	return promiseB
+}).then(function (resB) {
+	/* ... */
+	return promiseC
+}).then(resolved)
+						</code></pre>
+						<p>乐高积木：任意多的 promise 组合成一个最终的 promise !</p>
+					</section>
+					<section>
+						<h4>thunk 是 callback 的特别形式</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+fs.readFile(filePath, function (err, data) {
+  if (err) return console.error(err)
+  console.log(data)
+})
+
+function readFile(path) {
+	/* 返回 thunk */
+  return function(callback) {
+    fs.readFile(path, callback)
+  }
+}
+						</code></pre>
+						<p>CPS -> callback -> thunk</p>
+					</section>
+					<section>
+						<h4>thunk：标准化接口 thunk(callback)</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+thunk(function (err, res, ...) {
+	/* ... */
+})
+						</code></pre>
+						<p>thunk 是一个封装了特定任务的函数，运行该函数时任务才开始执行（惰性求值）</p>
+					</section>
+					<section>
+						<h4><a href="https://github.com/thunks/thunks" target="_blank">thunks</a>：让 thunk 具备像 promise 一样强大的组合能力</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+thunk(cb)(cb)(cb)(cb)(cb)(cb) /* thunk 链*/
+						</code></pre>
+						<pre><code class="javascript" data-trim contenteditable>
+thunk(1)(function (error, value) {
+	should(error).be.equal(null)
+	should(value).be.equal(1)
+	return Promise.resolve(2)
+})(function (error, value) {
+	should(error).be.equal(null)
+	should(value).be.equal(2)
+	return thunk(x)
+})(function (error, value) {
+	should(error).be.equal(null)
+	should(value).be.equal(x)
+})(done)
+						</code></pre>
+					</section>
+					<section>
+						<h4>generator, 神奇的异步原语</h4>
+						<pre><code class="javascript" data-trim contenteditable>
+thunk(function *() {
+  var p = yield promise
+  var t = yield thunk
+  var x = yield generator
+	/* ... */
+})
+						</code></pre>
+						<p>co 或 thunks 异步库使 generator 函数成为了 JS 中最强大的异步流程控制工具</p>
+					</section>
+					<section>
+						<p>关于 promise, thunk, generator 的入门可参考<br />阮一峰老师的博客</p>
+						<a href="http://www.ruanyifeng.com/blog/archives.html" target="_blank">http://www.ruanyifeng.com</a>
 					</section>
 				</section>
 
@@ -196,14 +313,10 @@ app.listen(3000);
 						<h2>异常处理机制</h2>
 					</section>
 					<section>
-						<h2>koa / co</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-// 截取部分代码
 app.callback = function(){
   var mw = [respond].concat(this.middleware);
-  var fn = this.experimental
-    ? compose_es7(mw)
-    : co.wrap(compose(mw));
+  var fn = co.wrap(compose(mw));
   var self = this;
 
   return function(req, res){
@@ -214,78 +327,85 @@ app.callback = function(){
   }
 };
 						</code></pre>
+						<p>koa / co 组合异步(同步)业务逻辑原理示意</p>
 					</section>
 					<section>
-						<h2>Toa / thunks</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-// 截取部分代码
-server.addListener('request', function(req, res) {
-	function onerror(err) {/*...*/}
+proto.toListener = function () {
+	var body = this.body
+  var middleware = this.middleware.slice()
+  return function requestListener (req, res) {
+    var ctx = createContext(app, req, res, onerror, thunks({
+      debug: debug,
+      onstop: onstop,
+      onerror: onerror
+    }))
 
-	var ctx = createContext(app, req, res);
-	var thunk = thunks({
-	  debug: debug,
-	  onerror: onerror
-	});
-
-	thunk.seq.call(ctx, middleware)(function() {
-	  return body.call(this, thunk);
-	})(function() {
-	  return thunk.seq.call(this, this.onPreEnd);
-	})(respond);
-});
+    ctx.thunk.seq.call(ctx, middleware)(function () {
+      return body.call(this, this.thunk)
+    })(function () {
+      return this.thunk.seq.call(this, this.onPreEnd)(respond)
+    })
+	}
+}
 						</code></pre>
+						<p>Toa / thunks 组合异步(同步)业务逻辑原理示意</p>
 					</section>
 					<section>
-						<h2>Teambition 用户社区代码</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-issueAPI.createIssue = function*() {
-  var token = this.token; // getter，自动验证 token
-  if (!token._id || token.hasRight < 0) this.throw(401);
-  var issue = yield this.parseBody();
-  issue = validateIssue(issue);
-  if (!issue.title) this.throw(422, 'Issue title required');
-  if (!issue.content) this.throw(422, 'Issue content required');
-  if (token.hasRight < 1 && issue.category === 'official') this.throw(422);
+issueAPI.createIssue = function *() {
+  if (this.token.hasRight < 0) this.throw(401)
+  var issue = yield this.parseBody()
+  issue = validateIssue(issue)
+  if (!issue.content) this.throw(422, 'Issue content required')
+
   issue = yield issueDao.createIssue({
     title: issue.title,
     content: issue.content,
-    category: issue.category || '',
-    createdBy: token._id
-  });
-  this.body = (yield fillCreatorAndUpdaterByArray([issue]))[0];
-};
+    createdBy: this.token._id
+  })
+  this.body = yield fillCreatorAndUpdater(issue)
+}
 						</code></pre>
+						<p>Teambition 用户社区代码示意</p>
 						<p class="fragment">用同步代码书写异步情怀</p>
 					</section>
 					<section>
-						<h2>灵活的 error catch</h2>
+						<h3>灵活的异常处理</h3>
 						<pre><code class="javascript" data-trim contenteditable>
-userAPI.findOrCreate = function*(user) {
-  if (!validator.isMongoId(user._id)) tools.throw(400);
+userAPI.findOrCreate = function *(user) {
+	/* 从 cookie 解出的 user 信息*/
   try {
-    user = yield userDao.findById(user._id);
+    user = yield userDao.findById(user._id)
   } catch (err) {
-    /* 自动创建用户 */
-    user = yield userDao.create(user);
-    user.isNew = true;
+    /* 用户不存在，自动创建用户 */
+    user = yield userDao.create(user)
+    user.isNew = true
   }
-  return yield findUserPreference(user);
-};
+  return yield findUserPreference(user)
+}
 						</code></pre>
-						<p class="fragment">自行 catch 处理，或抛给 koa / Toa 自动处理</p>
+						<p class="fragment">主动 try catch 异常并处理，<br />或由 koa / Toa 自动处理</p>
+					</section>
+					<section>
+						<h3>koa / Toa 异步小结</h3>
+						<ul>
+							<li>业务逻辑总是在 co / thunks 中运行</li>
+							<li>异步业务应该是 thunk 或 generator 函数，或返回 promise 的函数</li>
+							<li>但只有 thunk 或 generator 能绑定 `context` 对象，业务逻辑、中间件、模块一般就是 thunk 或 generator 函数</li>
+							<li>无需关注异常，co / thunks 能捕捉异常，koa / Toa 会自动处理异常。需要主动处理的异常自行 try catch 即可</li>
+						</ul>
 					</section>
 				</section>
 
 				<section>
 					<section>
-						<h2>koa / Toa 组件开发模式</h2>
+						<h3>koa / Toa 组件开发模式</h3>
 					</section>
 					<section>
-						<h2>中间件模式</h2>
 						<pre><code class="javascript" data-trim contenteditable>
 // koa-favicon
-module.exports = function (path, options){
+module.exports = function(path, options){
   /* 省略代码 */
   return function *favicon(next){
     if ('/favicon.ico' != this.path) return yield next;
@@ -302,79 +422,64 @@ module.exports = function (path, options){
   };
 };
 						</code></pre>
+						<p>中间件模式：处理业务流程</p>
 					</section>
 					<section>
-						<h2>原型方法模式</h2>
 						<pre><code class="javascript" data-trim contenteditable>
 // toa-token
 module.exports = function toaToken(app, secretOrPrivateKeys, options) {
 	/* 省略代码 */
-  app.verifyToken = app.context.verifyToken = verifyToken;
-  app.signToken = app.context.signToken = function(payload) {
-    return jwt.sign(payload, secretOrPrivateKeys[0], options);
-  };
+  app.verifyToken = app.context.verifyToken = verifyToken
+  app.signToken = app.context.signToken = function (payload) {
+    return jwt.sign(payload, secretOrPrivateKeys[0], options)
+  }
   app.decodeToken = app.context.decodeToken = function(token, options) {
-    return jwt.decode(token, options);
-  };
+    return jwt.decode(token, options)
+  }
   Object.defineProperty(app.context, 'token', {
     enumerable: true,
     configurable: false,
     get: function () {/* 省略代码 */}
-  });
+  })
 	/* 省略代码 */
-};
-						</code></pre>
-					</section>
-					<section>
-						<h2>更纯净的原型方法模式</h2>
-						<pre><code class="javascript" data-trim contenteditable>
-app.context.someCtxMethod = someCtxMethod(options);
-app.request.someReqMethod = someReqMethod(options);
-app.response.someResMethod = someResMethod(options);
-
-// Object.create 创建的 context, request, response
-function createContext(app, req, res) {
-  var context = Object.create(app.context);
-  var request = context.request = Object.create(app.request);
-  var response = context.response = Object.create(app.response);
-
-  response.request = request;
-  request.response = response;
-  request.ctx = response.ctx = context;
-  context.req = request.req = response.req = req;
-  context.res = request.res = response.res = res;
 }
 						</code></pre>
+						<p>原型方法模式：提供便捷方法</p>
 					</section>
 					<section>
-						<h2>小模块组件模式</h2>
 						<pre><code class="javascript" data-trim contenteditable>
-// use: var res = yield someServiceA(this.res);
-// generator function
-exports.someServiceA = function*(res) {
-	/*service code*/
-};
-// return thunk
-exports.someServiceB = function(req) {
-	return function(done) {
-		/*service code*/
-	};
-};
-// return promise
-exports.someServiceC = function(data) {
-	return new Promise(resolve, reject) {
-		/*service code*/
-	};
-};
+app.context.someCtxMethod = someCtxMethod(options)
+app.request.someReqMethod = someReqMethod(options)
+app.response.someResMethod = someResMethod(options)
 						</code></pre>
-						<p class="fragment">Toa 推荐模式，完全控制模块访问权限，更安全</p>
+						<p>更安全的原型方法模式</p>
+					</section>
+					<section>
+						<pre><code class="javascript" data-trim contenteditable>
+// generator function
+exports.someServiceA = function *(req) {
+	/*service code*/
+}
+// return thunk
+exports.someServiceB = function (user) {
+	return function (callback) {
+		/*service code*/
+	}
+}
+
+// use it
+var result1 = yield services.someServiceA(this.req)
+
+yield services.someServiceA(this.state.user)
+						</code></pre>
+						<p>小模块组件模式，一个功能模块就是一个 generator 或 thunk 函数</p>
+						<p class="fragment">Toa 推荐模式，提供仅需的参数即可，完全控制模块访问权限，更安全</p>
 					</section>
 				</section>
 
 				<section>
-					<h2>那么，开发实践？</h2>
-					<p class="fragment">前端 -> 异步控制 -> 轮子 Toa -> 重构后端服务</p>
-					<h2 class="fragment">Q / A</h2>
+					<h1>Q / A</h1>
+					<h2><a href="https://github.com/toajs">https://github.com/toajs</a></h2>
 				</section>
 
 			</div>
@@ -385,6 +490,5 @@ exports.someServiceC = function(data) {
 		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
 		<script src="../assets/reveal.js/js/reveal.js"></script>
 		<script src="../assets/js/app.js"></script>
-		<script src="//google-analytics.com/ga.js"></script>
 	</body>
 </html>

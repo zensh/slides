@@ -1,7 +1,60 @@
-.zensh .fragment.left {
-  text-align: left !important;
-}
-
 .zensh .slide-background {
   background-size: contain !important;
+}
+
+.zensh h1,
+.zensh h2,
+.zensh h3,
+.zensh h4 {
+  text-transform: none;
+}
+.zensh .blue {
+  color: #5677fc
+}
+.zensh .red {
+  color: #e51c23
+}
+.zensh .green {
+  color: #259b24
+}
+
+.zensh .teambition-logo {
+  font: 120px 'Ubuntu';
+  font-weight: bold;
+}
+.zensh .koa-logo {
+  font: 150px 'Italiana', sans-serif;
+}
+.zensh .toa-logo {
+  font: 150px 'Times', sans-serif;
+}
+
+.zensh .koa-logo span,
+.zensh .toa-logo span {
+  margin-left: 30px;
+  color: #259b24;
+  font: 75px sans-serif;
+  vertical-align: middle;
+}
+
+.zensh .quanzhan-smile {
+  position: absolute;
+  right: -200px;
+  bottom: -200px;
+  width: 400px;
+  height: 325px;
+  background: url('../img/quanzhan.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.zensh .pride-smile {
+  position: absolute;
+  right: -50px;
+  bottom: -100px;
+  width: 200px;
+  height: 200px;
+  background: url('../img/smile.png');
+  background-repeat: no-repeat;
+  background-size: contain;
 }

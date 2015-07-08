@@ -1,0 +1,106 @@
+body {
+  margin: 0;
+  background-color: #000;
+  font-family: "Avenir Next", "Segoe UI", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-weight: 100;
+  color: #fffff0;
+}
+
+a {
+  color: #ccffcc;
+  text-decoration: none;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+h1 {
+  margin: 100px;
+  font-size: 200px;
+}
+
+a:hover {
+  color: #87ceeb;
+}
+
+.particle {
+  height: 100%;
+}
+
+.slide {
+  vertical-align: middle;
+  text-align: center;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+.slide p {
+  margin: auto;
+  min-width: 500px;
+}
+
+.step {
+  font-size: 32px;
+}
+.impress-enabled .step {
+  margin: 0;
+  opacity: 0.05;
+  background-color: transparent;
+  -webkit-transition: all 1s;
+  -moz-transition: all 1s;
+  -ms-transition: all 1s;
+  -o-transition: all 1s;
+  transition: all 1s;
+}
+.impress-enabled .step.active {
+  margin: auto;
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+@font-face {
+  font-family: 'profile';
+  src: url('../fonts/profile.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/profile.woff') format('woff'),
+       url('../fonts/profile.ttf') format('truetype'),
+       url('../fonts/profile.svg#profile') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+  font-family: "profile";
+  font-style: normal;
+  font-weight: normal;
+  speak: none;
+
+  display: inline-block;
+  text-decoration: inherit;
+  width: 1em;
+  margin-right: .2em;
+  text-align: center;
+  /* opacity: .8; */
+
+  /* For safety - reset parent styles, that can break glyph codes*/
+  font-variant: normal;
+  text-transform: none;
+
+  /* fix buttons height, for twitter bootstrap */
+  line-height: 1em;
+
+  /* Animation center compensation - margins should be symmetric */
+  /* remove if not needed */
+  margin-left: .2em;
+
+  /* you can be more comfortable with increased icons size */
+  /* font-size: 120%; */
+
+  /* Uncomment for 3D effect */
+  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}
+
+.icon-twitter:before { content: '\e800'; } /* '' */
+.icon-weibo:before { content: '\e801'; } /* '' */
+.icon-github-circled:before { content: '\e802'; } /* '' */
