@@ -64,7 +64,7 @@
   // console.log(event.previousSlide, event.currentSlide, event.indexh, event.indexv)
   // })
 
-  window._gaq = window._gaq || []
+  var _gaq = window._gaq = window._gaq || []
   _gaq.push(['_setAccount', 'UA-63568675-1'])
   _gaq.push(['_trackPageview'])
   _gaq.push(['send', 'pageview'])

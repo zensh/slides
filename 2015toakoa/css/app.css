@@ -1,3 +1,6 @@
+.zensh.reveal pre code {
+  font-family: Consolas;
+}
 .zensh .slide-background {
   background-size: contain !important;
 }
