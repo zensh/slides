@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>理解 JavaScript 异步</title>
+		<meta name="description" content="">
+		<meta name="author" content="zensh">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+		<link rel="stylesheet" href="../assets/css/normalize.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/github-light.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/main.css" media="screen">
+		<link rel="stylesheet" href="../assets/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../assets/reveal.js/css/theme/beige.css" id="theme">
+		<link rel="stylesheet" href="../assets/reveal.js/lib/css/zenburn.css">
+		<link rel="stylesheet" href="css/app.css">
+	</head>
+	<body>
+		<div class="reveal zensh">
+			<div class="slides">
+				<section>
+					<h1>理解 JS 异步</h1>
+					<strong>初级 · 中级 · 高级 · 现实</strong>
+					<p>
+						<small><a href="https://github.com/zensh">github.com/zensh</a><span> | </span><a href="http://weibo.com/zensh">@ZENSH严清</a></small>
+					</p>
+				</section>
+
+
+				<section>
+					<h3>0. 底层：异步的基本原理</h3>
+					<p>系统级：libuv, libev, iocp, epoll, poll, select ...</p>
+					<p>语言级：CPS, CSP, actors, disruptor, threads ...</p>
+					<div class="muted">CSP: Communicating sequential processes(Go 的 goroutine)</div>
+					<div class="muted">CPS: Continuation-passing style(源自 Scheme, JS 的 callback)</div>
+				</section>
+
+
+				<section>
+					<section>
+						<h3>1. 初级：JS 原始的异步 API</h3>
+						<p>互联网中诞生的语言，天生的异步重任</p>
+					</section>
+					<section>
+						<p>浏览器中原始的异步 API</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// click 事件
+document.onclick = function (e) {
+  console.log(e)
+}
+
+// image 加载
+var img = new Image()
+img.onload = function (e) {
+  console.log(e)
+}
+img.onerror = img.abort = function (e) {
+  console.error(e)
+}
+img.src = imgUrl
+						</code></pre>
+					</section>
+					<section>
+						<p>XMLHttpRequest: 封装后才是人用的</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// 复杂的 XMLHttpRequest，简单封装示意
+function request (url, callback) {
+  var xhr = new XMLHttpRequest()
+
+  xhr.onreadystatechange = function () {
+    // readyState 0 ~ 4
+    if (xhr.readyState !== XMLHttpRequest.DONE) return
+    if (xhr.status === 200) callback(null, xhr.response)
+    else callback(xhr)
+  }
+
+  xhr.open('GET', url)
+  xhr.send()
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>Node.js API 的 callback 封装</p>
+						<ul>
+							<li>fs.link(srcpath, dstpath, callback)</li>
+							<li>fs.readFile(file[, options], callback)</li>
+							<li>fs.writeFile(file, data[, options], callback)</li>
+							<li>...</li>
+						</ul>
+						<pre><code class="javascript" data-trim contenteditable>
+fs.stat = function (path, callback) {
+	callback = makeCallback(callback)
+	if (!nullCheck(path, callback)) return
+
+	var req = new FSReqWrap()
+	req.oncomplete = callback
+	binding.stat(pathModule._makeLong(path), req)
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>为什么要用 callback 封装？</p>
+						<p>底层为什么不直接提供封装后的 API ？</p>
+					</section>
+					<section>
+						<p>`onXXX` 和 `callback`两种形式共存</p>
+						<pre><code class="javascript" data-trim contenteditable>
+proto.onopen = function () {/* ... */}
+proto.onclose = function () {/* ... */}
+proto.onerror = function (error) {/* ... */}
+proto.onmessage = function (event) {/* ... */}
+proto.request = function (method, params, callback) {/* ... */}
+proto.connect = function (url, options) {/* ... */}
+proto.close = function () {/* ... */}
+
+// 如果把 `onXXX` 改写成 `callback` 形式
+proto.connect = function (url, options, callback) {/* ... */}
+proto.close = function (callback) {/* ... */}
+						</code></pre>
+						<p>https://github.com/teambition/snapper-consumer</p>
+					</section>
+					<section>
+						<p>`onXXX` 形式内部实现也更简单，<br/>提供的接口更灵活，更丰富</p>
+						<p>但对于上层开发者来说，封装后才好使</p>
+					</section>
+				</section>
+
+
+				<section>
+					<section>
+						<h3>2. 中级： JS 异步的封装和抽象</h3>
+					</section>
+					<section>
+						<p>Callback 的原罪 —— Callback Hell</p>
+						<pre><code class="javascript" data-trim contenteditable>
+function testCollection (db, callback) {
+  db.createCollection("test", function(err, collection) {
+    if (err) return callback(err)
+    collection.insertOne({a:1}, {w:1}, function(err, result) {
+      if (err) return callback(err)
+      db.dropCollection("test", function(err, result) {
+        if (err) return callback(err)
+        // bombFn()
+        db.listCollections({name:"test"}).toArray(function(err, names) {
+          db.close()
+          callback(err, names)
+        })
+      })
+    })
+  })
+})
+						</code></pre>
+					</section>
+					<section>
+						<p>原始 callback 的两个天生缺陷</p>
+						<ul>
+							<li>不可流程组合，但一个 API 需要组合各种底层异步 API</li>
+							<li>不可捕获异常，但程序员最擅长埋炸弹 bombFn~</li>
+						</ul>
+					</section>
+					<section>
+						<p>Callback 的流程控制工具 async</p>
+						<pre><code class="javascript" data-trim contenteditable>
+async.each(fileList, function (file, callback) {
+  fs.stat(path, callback)
+}, function (err) {
+  // all finish
+})
+
+async.waterfall([
+  function(callback) { callback(null, 'one', 'two') },
+  function(arg1, arg2, callback) { callback(null, 'three') }
+], function (err, result) {
+  // result now equals 'three'
+})
+						</code></pre>
+						<p>内部可以组合 callback 异步任务，<br/>但自身不可组合</p>
+					</section>
+					<section>
+						<p>Callback 的流程控制工具 thenjs</p>
+						<pre><code class="javascript" data-trim contenteditable>
+Thenjs
+  .each(['file1.json', 'file2.json'], function (callback, path) {
+    // do some more stuff ...
+    fs.stat(path, callback)
+  })
+  .then(function (callback, result) {
+    // do some more stuff ...
+  })
+  .fail(function (callback, error) {
+    console.error('A file path error: ', error)
+  })
+						</code></pre>
+						<p>async 和 promise 的结合体，<br/>可随意组合，但不是标准的异步原语</p>
+					</section>
+					<section>
+						<p>JS 的异步标准 —— <strong class="red">Promise</strong></p>
+						<pre><code class="javascript" data-trim contenteditable>
+request('test.com/login')
+  .then(function (user) {
+    return request('test.com/posts')
+  })
+  .then(function (postList) {
+    return Promise.all(postList.map(function (post) {
+      return request('test.com/posts/' + post._id)
+    }))
+  })
+  .then(function (posts) {
+    console.log(posts)
+  })
+  .catch(function (error) {
+    console.error(error)
+  })
+						</code></pre>
+					</section>
+					<section>
+						<p>异步组合的基础：异步原语之 promise</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// Promise 封装 request
+var Promise = require('promise')
+function request (url) {
+  return new Promise(function (resolve, reject) {
+    var xhr = new XMLHttpRequest()
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== XMLHttpRequest.DONE) return
+      if (xhr.status === 200) resolve(xhr.response)
+      else reject(xhr)
+    }
+
+    xhr.open('GET', url)
+    xhr.send()
+  })
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>异步组合的基础：异步原语之 promise</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// Promise 封装 request
+var Promise = require('promise')
+function request (url) {
+	return new Promise(function (resolve, reject) {
+		var xhr = new XMLHttpRequest()
+
+		xhr.onreadystatechange = function () {
+			if (xhr.readyState !== XMLHttpRequest.DONE) return
+			if (xhr.status === 200) resolve(xhr.response)
+			else reject(xhr)
+		}
+
+		xhr.open('GET', url)
+		xhr.send()
+	})
+}
+						</code></pre>
+					</section>
+					<section data-background="img/promise-hell.png"></section>
+					<section>
+						<p>Promise Hell?</p>
+						<p>即便 Promise，业务逻辑复杂后，嵌套不可避免！</p>
+						<p>无解? 有解，见高级篇</p>
+					</section>
+					<section>
+						<p>Callback 就这样被淘汰?</p>
+						<p>No！thunk 让它重生</p>
+						<p>CPS ➟ Callback ➟ thunk</p>
+						<p>https://github.com/thunks/thunks</p>
+					</section>
+					<section>
+						<p>异步原语之 thunk</p>
+						<pre><code class="javascript" data-trim contenteditable>
+function request (url) {
+  // return a thunk function
+  return function (callback) {
+    var xhr = new XMLHttpRequest()
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== XMLHttpRequest.DONE) return
+      if (xhr.status === 200) callback(null, xhr.response)
+      else callback(xhr)
+    }
+
+    xhr.open('GET', url)
+    xhr.send()
+  }
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>异步原语之 promise 抽象</p>
+						<pre><code class="javascript" data-trim contenteditable>
+var promise = request('http://test.com')
+promise.then(function (result) {
+  console.log(result)
+}, function (error) {
+  console.error(error)
+})
+						</code></pre>
+						<p>异步原语之 thunk 抽象</p>
+						<pre><code class="javascript" data-trim contenteditable>
+var thunk = request('http://test.com')
+thunk(function (error, result) {
+  if (error) console.error(error)
+  else console.log(result)
+})
+						</code></pre>
+					</section>
+					<section>
+						<p>什么是异步原语？对外提供简单一致的异步 API</p>
+						<pre><code class="javascript" data-trim contenteditable>
+promise.then(function (res) {}, function (err) {})
+// vs
+thunk(function (err, res) {})
+						</code></pre>
+						<p>promise 可以 promise.then(fn).then(fn)... 组合</p>
+						<p>thunk 自身怎么组合，要配合 async，thenjs？</p>
+					</section>
+					<section>
+						<p>强化 thunk 函数：<br/>https://github.com/thunks/thunks</p>
+						<pre><code class="javascript" data-trim contenteditable>
+var thunk = require('thunks')()
+function request (url) {
+	// return 一个增强的 thunk function
+  return thunk(function (callback) {
+    var xhr = new XMLHttpRequest()
+
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== XMLHttpRequest.DONE) return
+      if (xhr.status === 200) callback(null, xhr.response)
+      else callback(xhr)
+    }
+
+    xhr.open('GET', url)
+    xhr.send()
+  })
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>增强的 thunk 函数，自身也能实现强大的组合</p>
+						<pre><code class="javascript" data-trim contenteditable>
+request('test.com/login')(function (error, user) {
+  if (error) throw error
+
+  return request('test.com/posts')
+})(function (error, postList) {
+  if (error) throw error
+
+  return thunk.all(postList.map(function (post) {
+    return request('test.com/posts/' + post._id)
+  }))
+})(function (error, posts) {
+  console.log(error, posts)
+})
+						</code></pre>
+						<p>每次都要 error 判断？蛋疼！<br/>No，可以定义基于 scope 的 error 监听<br/>实际场景也不会这么用，除了写特殊测试</p>
+					</section>
+					<section>
+						<p><strong class="blue">promise</strong> VS <strong class="blue">thunk</strong>?</p>
+						<p>promise 是 ES2015 标准，thunk 是历史的演进</p>
+						<p>都是异步原语，都能实现异步组合，<br/>promise 是对象，thunk 是函数，从而：</p>
+						<ul>
+							<li>thunk 函数可绑定 <strong class="red">this</strong>，promise 不可能</li>
+							<li>thunk 函数可惰性求值，promise 是及早求值</li>
+							<li>promise 的组合能力受限，thunk 更强大</li>
+						</ul>
+					</section>
+					<section>
+						<p>基本的流程控制能力，但无法实现的 Promise.seq</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// 并行执行一组异步任务
+thunk.all([t1, t2, t3])
+// 串行执行一组异步任务
+thunk.seq([t1, t2, t3])
+
+Promise.all([p1, p2, p3])
+// Promise.seq([p1, p2, p3]) ???
+						</code></pre>
+					</section>
+				</section>
+
+
+				<section>
+					<section>
+						<h3>3. 高级：同步代码书写异步情怀</h3>
+						<p>异步组合/流程控制真的很复杂，Promise 不够用！</p>
+					</section>
+					<section>
+						<p>co 给 Generator 函数注入了奇迹</p>
+						<pre><code class="javascript" data-trim contenteditable>
+co(function *(){
+  // resolve multiple promises in parallel
+  console.log(yield request('http://test.com'))
+  console.log(yield [
+    request('http://test.com/1'),
+    request('http://test.com/2'),
+    request('http://test.com/3')
+  ])
+}).catch(console.log.bind(console))
+						</code></pre>
+					</section>
+					<section>
+						<p>thunks 带来了更多奇迹</p>
+						<pre><code class="javascript" data-trim contenteditable>
+var client = redis.createClient()
+thunk.call(client, function *() {
+  console.log(yield this.info())
+
+  yield this.set('foo', 'bar')
+  yield this.set('bar', 'baz')
+  console.log('foo -> %s', yield this.get('foo'))
+  console.log('bar -> %s', yield this.get('bar'))
+
+  yield [
+    this.multi(),
+    this.set(user.id, JSON.stringify(user)),
+    this.zadd('userAge', user.age, user.id),
+    this.exec()
+  ]
+})(console.error.bind(console))
+						</code></pre>
+						<p>同步书写，全局异常捕捉，this 绑定</p>
+					</section>
+					<section>
+						<p>更多 promise, co, thunks 的代码对比</p>
+						<a>https://github.com/thunks/thunks/tree/master/benchmark</a>
+					</section>
+					<section>
+						<p>Generator 还不够？</p>
+						<p>ES7 带来最好的异步方案 async/await？</p>
+						<pre><code class="javascript" data-trim contenteditable>
+const testAsync = async () => {
+  const t = await somePromise
+  console.log(t)
+};
+testAsync()
+						</code></pre>
+						<p>静静等待 async/await 的原生实现，静静在怀疑</p>
+					</section>
+				</section>
+
+
+				<section>
+					<section>
+						<h3>4. 现实：真实异步需求更复杂</h3>
+						<p>几个异步案例细节</p>
+					</section>
+					<section>
+						<p> koa v1 和 v2，从 generator 到 async/await</p>
+						<pre><code class="javascript" data-trim contenteditable>
+var app = koa()
+app.use(function *(next) {
+  var start = new Date
+  yield next
+  console.log('%s %s - %s', this.method, this.url, new Date - start)
+})
+app.use(function *() {
+  this.body = 'Hello World'
+})
+app.listen(3000)
+						</code></pre>
+					</section>
+					<section>
+						<p>async/await 版本的 koa，强大的 this 没了</p>
+						<pre><code class="javascript" data-trim contenteditable>
+const app = new Koa()
+app.use(async (ctx, next) => {
+  const start = new Date
+  await next()
+  console.log(`${ctx.method} ${ctx.url} - ${new Date - start}ms`)
+})
+app.use(ctx => {
+  ctx.body = 'Hello World'
+})
+app.listen(3000)
+						</code></pre>
+						<p>只是多传一个参数的问题？<br/>不，v1的中间件全部不能兼容</p>
+					</section>
+					<section>
+						<p>完全 hold 住的异常</p>
+						<pre><code class="javascript" data-trim contenteditable>
+fs.stat('/tmp/hello', function (err, stat) {
+  if (err) throw err // process exit！
+  console.log('/tmp/hello', stat)
+})
+// thunks
+fsUnlink('/tmp/hello')(function (err, stat) {
+  if (err) throw err
+  console.log('/tmp/hello', stat)
+})(function (err) { console.error(err) })
+// promise
+fsUnlink('/tmp/hello')
+  .then(function (stat) {
+    console.log('/tmp/hello', stat)
+    throw new Error('some error')
+  })
+  .catch(function (err) { console.error(err) })
+						</code></pre>
+					</section>
+					<section>
+						<p>koa / toa 的异常处理机制，完全 catch 异常</p>
+						<pre><code class="javascript" data-trim contenteditable>
+// toa 中的 app 原型上的全局 onerror，任何 error 均会在此汇集
+proto.onerror = function (err) {
+  // ignore null and response error
+  if (err == null || err.expose || (err.status && err.status < 500)) return
+  if (!util.isError(err)) err = new Error('non-error thrown: ' + err)
+
+  // catch system error
+  var msg = err.stack || err.toString()
+  console.error(msg.replace(/^/gm, '  '))
+}
+						</code></pre>
+					</section>
+					<section>
+						<p>文件转换服务中的异步控制需求</p>
+						<p>一个 node.js 进程内，无论有多少转换请求，Office 转换 PDF 线程同时最多运行三个，多余的进入队列等待</p>
+						<a>https://github.com/thunks/thunk-workers</a>
+					</section>
+					<section>
+						<p>文件服务中 node stream 的异步控制</p>
+					</section>
+				</section>
+
+
+				<section>
+					<h1>Q / A</h1>
+				</section>
+			</div>
+		</div>
+
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/js/app.js"></script>
+	</body>
+</html>

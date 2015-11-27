@@ -1,0 +1,27 @@
+.zensh.reveal pre code {
+  font-family: Consolas;
+}
+.zensh .slide-background {
+  background-size: contain !important;
+}
+
+.zensh h1,
+.zensh h2,
+.zensh h3,
+.zensh h4 {
+  text-transform: none;
+}
+.zensh .blue {
+  color: #5677fc
+}
+.zensh .red {
+  color: #e51c23
+}
+.zensh .green {
+  color: #259b24
+}
+
+.zensh .muted {
+  font-size: 0.75em;
+  color: gray;
+}
