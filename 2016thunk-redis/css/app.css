@@ -1,0 +1,31 @@
+.zensh.reveal code {
+  font-family: Consolas;
+  font-size: 0.8em;
+  color: white;
+  background-color: #222;
+  padding: 5px 10px 2px;
+  border-radius: 5px;
+  vertical-align: middle;
+}
+.zensh .slide-background {
+  background-size: contain !important;
+}
+
+.zensh h1,
+.zensh h2,
+.zensh h3,
+.zensh h4 {
+  text-transform: none;
+}
+.zensh .blue {
+  color: blue;
+}
+.zensh .red {
+  color: red;
+}
+.zensh .green {
+  color: green;
+}
+.zensh .yellow {
+  color: yellow;
+}

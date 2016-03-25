@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>thunk-redis</title>
+		<meta name="description" content="">
+		<meta name="author" content="zensh">
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+		<link rel="stylesheet" href="../assets/css/normalize.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/github-light.css" media="screen">
+		<link rel="stylesheet" href="../assets/css/main.css" media="screen">
+		<link rel="stylesheet" href="../assets/reveal.js/css/reveal.css">
+		<link rel="stylesheet" href="../assets/reveal.js/css/theme/beige.css" id="theme">
+		<link rel="stylesheet" href="../assets/reveal.js/lib/css/zenburn.css">
+		<link rel="stylesheet" href="css/app.css">
+	</head>
+	<body>
+		<div class="reveal zensh">
+			<div class="slides">
+				<section>
+					<h1>thunk-redis</h1>
+					<ul>
+						<li>redis 客户端实现原理</li>
+						<li>redis 高级特性使用</li>
+					</ul>
+					<p>
+						<small><a href="https://github.com/zensh">github.com/zensh</a><span> | </span><a href="http://weibo.com/zensh">@ZENSH严清</a></small>
+					</p>
+				</section>
+
+				<section data-background="img/github.png">
+					<section></section>
+					<section data-background="rgba(255, 255, 255, 0.9)" data-background-transition="zoom">
+						<h3><a href="https://github.com/thunks/thunk-redis">/thunks/thunk-redis</a></h3>
+						<ul>
+							<li>第一个实现 cluster 特性的 redis 客户端</li>
+							<li>Node.js 下最快，特性最全，<span class="red">star</span>最少~</li>
+						<ul>
+						<p><small class="blue">造轮子：node_redis 代码凌乱，用着纠结；验证 thunks</small></p>
+					</section>
+					<section data-background="rgba(255, 255, 255, 0.9)" data-background-transition="zoom">
+						<h3>Teambition 在用场景：</h3>
+						<ul>
+							<li>Teambition 用户社区的数据库</li>
+							<li>基于 engine.io 的消息推送系统</li>
+							<li>定时任务系统、智能限速模块、邮件队列系统、分布式锁等</li>
+						<ul>
+					</section>
+				</section>
+
+				<section>
+					<section data-background="img/redis.001.png"></section>
+					<section>
+						<h3><a href="http://redis.io/topics/protocol">Redis Protocol specification</a></h3>
+						<ul>
+	            <li><strong>Simple Strings:</strong> <code>+<span class="yellow">OK</span>\r\n</code></li>
+	            <li><strong>Errors:</strong> <code>-<span class="yellow">Error message</span>\r\n</code></li>
+	            <li><strong>Integers:</strong> <code>:<span class="yellow">123</span>\r\n</code></li>
+	            <li><strong>Bulk Strings:</strong> <code>$3\r\n<span class="yellow">123</span>\r\n</code>, <code>$0\r\n\r\n</code>, <code>$-1\r\n</code></li>
+	            <li><strong>Arrays:</strong> <code>*0\r\n</code>, <code>*-1\r\n</code>, <code>'*3\r\n$3\r\n<span class="yellow">SET</span>\r\n$3\r\n<span class="yellow">key</span>\r\n$2\r\n<span class="yellow">Hi</span>\r\n'</code></li>
+            </ul>
+					</section>
+					<section data-background="img/redis.002.png"></section>
+					<section>
+						<h3><a href="https://github.com/zensh/resp.js">/zensh/resp.js</a></h3>
+						<ul>
+							<li>第一个纯 JS 的，编码、解码完整的 RESP 实现</li>
+							<li>实现核心：数据流式解析</li>
+							<li>也是简单通用的 RPC 通信协议</li>
+						<ul>
+						<p><a class="red" href="https://github.com/zensh/resp.js/blob/master/example/redis_client.js"
+							>一个 30 行基于 resp.js 的 redis client</a></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h3>从<span class="red">30</span>行扩张到<span class="red">1300</span>行的thunk-redis</h3>
+						<ul>
+	            <li>特殊命令及一些语法糖(thunk|promise API, 数据预处理)</li>
+	            <li>智能链接管理、异常拯救等(重连，主从，cluster 节点发现)</li>
+	            <li>完整 Cluster 支持</li>
+            </ul>
+					</section>
+					<section data-background="img/redis.003.png"></section>
+				</section>
+
+				<section>
+					<section>
+						<h3>多重限速：<a href="https://github.com/thunks/thunk-ratelimiter">/thunks/thunk-ratelimiter</a></h3>
+						<ul>
+							<li>支持多重（智能）限速策略</li>
+	            <li>node.js 下最快的限速模块</li>
+							<li>分布式/原子操作</li>
+	            <li>支持 Cluster 模式</li>
+            </ul>
+						<p><span class="blue">特性标签：</span><span class="red">生存时间，Lua，Hash</span></p>
+					</section>
+					<section>
+						<pre><code class="txt" data-trim contenteditable>
+HTTP/1.1 200 OK
+
+X-RateLimit-Limit:5
+X-RateLimit-Remaining:4
+X-RateLimit-Reset:1458965660
+						</code></pre>
+						<pre><code class="js" data-trim contenteditable>
+Limit {
+  total: 5,
+  remaining: 5,
+  duration: 3600000,
+  reset: 1458965660053 }
+						</code></pre>
+						<pre><code class="txt" data-trim contenteditable>
+Redis Hash:
+  ct(count): 5
+  lt(limit): 5
+  dn(duration): 3600000
+  rt(reset): 1458965660053
+						</code></pre>
+						<p>限速状态数据基本结构示例</p>
+					</section>
+					<section>
+						<h3><a href="https://github.com/teambition/smart-limiter">/teambition/smart-limiter</a></h3>
+						<pre><code class="json" data-trim contenteditable>
+"limiter": {
+  "prefix": "TB_LIMIT",
+  "duration": 60000,
+  "policy": {
+    "GET": [150, 60000, 60, 60000, 30, 120000],
+    "PUT": [60, 60000, 30, 60000, 30, 120000],
+    "POST": [40, 60000, 20, 60000],
+    "DELETE": [60, 60000, 20, 60000],
+    "/api/users/me": [20, 60000, 5, 60000],
+    "POST /api/organizations": [10, 60000, 2, 60000],
+    "POST /api/projects": [20, 60000, 5, 60000]
+  }
+}
+						</code></pre>
+						<p>基于 thunk-ratelimiter 的智能限速配置说明</p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h3>定时任务：<a href="https://github.com/teambition/timed-queue">/teambition/timed-queue</a></h3>
+						<ul>
+							<li>支持多重实例（配置独立）</li>
+	            <li>每个实例支持多重队列</li>
+							<li>表现为中心服务，实质是客户端模块</li>
+							<li>分布式/原子操作</li>
+	            <li>支持 Cluster 模式</li>
+            </ul>
+						<p><span class="blue">特性标签：</span><span class="red">生存时间，Lua，Hash，SortedSet</span></p>
+					</section>
+					<section data-background="img/timed_queue.png"></section>
+				</section>
+
+				<section>
+					<section>
+						<h3>消息推送 <a href="https://github.com/teambition/snapper-core">/teambition/snapper-core</a></h3>
+						<p>Teambition 当前在用的分布式消息推送系统</p>
+						<p>基于 Redis 和 Engine.io</p>
+						<p><span class="blue">特性标签：</span><span class="red">生存时间，Lua, Hash，Pub/Sub</span></p>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h3>分布式锁 <a href="https://github.com/orangemi/process-locker">/orangemi/process-locker</a></h3>
+						<p>Teambition 文件转换服务和微信认证回调的任务锁</p>
+						<p><span class="blue">特性标签：</span><span class="red">生存时间，Lua, Pub/Sub</span></p>
+					</section>
+				</section>
+
+				<section>
+					<h1>Q / A</h1>
+					<h2><a href="https://github.com/thunks/thunk-redis">/thunks/thunk-redis</a></h2>
+				</section>
+
+			</div>
+		</div>
+
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/reveal.js/lib/js/head.min.js"></script>
+		<script src="../assets/reveal.js/js/reveal.js"></script>
+		<script src="../assets/js/app.js"></script>
+	</body>
+</html>
